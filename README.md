@@ -1,4 +1,4 @@
-# lc-starter-gen: Leetcode Starter-Code Generator 
+# Leetcode-boilerplate-generator: Leetcode Boilerplate Generator 
 
 ## TODO
   - [ ] Support more extensions [will need significant work]
