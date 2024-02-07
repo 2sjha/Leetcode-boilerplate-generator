@@ -1,53 +1,13 @@
+mod api_calls;
+mod generator;
+mod parser;
 mod utils;
-use reqwest::blocking::get;
-use scraper::{Html, Selector};
 use std::fs::File;
 use std::io;
 use std::io::Write;
 use utils::CustomError;
 
-fn parse_url(problem_url: &String) -> Result<(String, String, String), CustomError> {
-    let response_res = get(problem_url);
-    if response_res.is_err() {
-        return Err(CustomError::from(format!(
-            "{}: {}",
-            "Error Occured. Couldn't reach URL", problem_url
-        )));
-    }
-    let response = response_res.unwrap();
-    if !response.status().is_success() {
-        return Err(CustomError::from(format!(
-            "{}: {:?}",
-            "Error Occured. HTTP Error Status",
-            response.status()
-        )));
-    }
-
-    let html_res = response.text();
-    if html_res.is_err() {
-        return Err(CustomError::from(format!(
-            "{}: {}",
-            "Error Occured. Couldn't read HTML from URL", problem_url
-        )));
-    }
-
-    let html_body = html_res.unwrap();
-    let document = Html::parse_document(&html_body);
-
-    // PROBLEM: leetcode first renders a Dynamic Layout prompt. So cant directly fetch problem page.
-
-
-    // Define a selector to select all <a> tags
-    let a_selector = Selector::parse("a").unwrap();
-    for a in document.select(&a_selector) {
-        let href = a.value().attr("href").unwrap_or("");
-        println!("Found link: {}", href);
-    }
-
-    Ok(("0".to_string(), "".to_string(), "".to_string()))
-}
-
-fn get_problem_name(problem_url: &String) -> Result<String, CustomError> {
+fn get_title_slug(problem_url: &String) -> Result<String, CustomError> {
     let url_parts: Vec<&str> = problem_url.split('/').collect();
 
     // Exxample URL: https://leetcode.com/problems/remove-duplicates-from-sorted-array/?envType=study-plan-v2&envId=top-interview-150
@@ -61,28 +21,30 @@ fn get_problem_name(problem_url: &String) -> Result<String, CustomError> {
     Ok(url_parts[4].to_string())
 }
 
-fn main() -> Result<(), CustomError> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     print!("Leetcode Problem URL: ");
     let _ = io::stdout().flush();
     let mut problem_url: String = String::new();
     let _input_result = io::stdin().read_line(&mut problem_url);
 
-    let problem_name: String = get_problem_name(&problem_url)?;
-    let (problem_number, description, starter_code) = parse_url(&problem_url)?;
+    let problem_name: String = get_title_slug(&problem_url)?;
+    let question_info: String = api_calls::get_question_info(&problem_name)?;
+    let question_content: String = api_calls::get_question_content(&problem_name)?;
+    let question_editor_data: String = api_calls::get_question_editor_data(&problem_name)?;
 
-    // TODO: Support more extensions [will need significant work]
-    let extension = "cpp";
+    let extension: String = "cpp".to_string();
+    let problem_number: String = parser::parse_problem_number(&question_info);
+    let description: String =
+        parser::parse_description(&problem_url, &extension, &question_content);
+    let examples: String = parser::parse_examples(&description);
+    let starter_code = parser::parse_starter_code(&question_editor_data, &extension);
+    let driver_code = generator::generate_driver_code(&examples, &extension);
+
     let filename = format!("{}-{}.{}", problem_number, problem_name, extension);
-    let file_res = File::create(&filename);
-    if file_res.is_err() {
-        return Err(CustomError::from(format!(
-            "{}: {}",
-            "Error occurred. Couldn't create file: ", filename
-        )));
-    }
-    let mut file = file_res.unwrap();
+    let mut file = File::create(&filename)?;
     let _ = file.write_all(description.as_bytes());
     let _ = file.write_all(starter_code.as_bytes());
+    let _ = file.write_all(driver_code.as_bytes());
 
     Ok(())
 }
