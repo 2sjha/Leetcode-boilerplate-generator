@@ -14,12 +14,6 @@ fn get_headers() -> header::HeaderMap {
         header::CONTENT_TYPE,
         header::HeaderValue::from_static("application/json"),
     );
-    // headers.insert(
-    //     "x-csrftoken",
-    //     HeaderValue::from_static(
-    //        "eTY4dRgZ9BVpqMHuFgylqqq6QuayRv2X0WBUtu4lZGsIuIcj2hvHeOgawJdVGKea",
-    //     ),
-    // );
 
     headers
 }
@@ -59,7 +53,7 @@ pub async fn get_question_info(title_slug: &String) -> Result<String, Box<dyn st
 
     if response.status().is_success() {
         let body: String = response.text().await?;
-        // println!("{}", body);
+        println!("{}", body);
         return Ok(body);
     } else {
         return Err(CustomError::from(format!(
@@ -101,7 +95,7 @@ pub async fn get_question_content(
 
     if response.status().is_success() {
         let body: String = response.text().await?;
-        // println!("{}", body);
+        println!("{}", body);
         return Ok(body);
     } else {
         return Err(CustomError::from(format!(
@@ -151,7 +145,7 @@ pub async fn get_question_editor_data(
 
     if response.status().is_success() {
         let body = response.text().await?;
-        // println!("{}", body);
+        println!("{}", body);
         return Ok(body);
     } else {
         return Err(CustomError::from(format!(
