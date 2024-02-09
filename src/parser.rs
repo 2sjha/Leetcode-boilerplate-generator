@@ -1,7 +1,16 @@
-use crate::utils::CustomError;
+use crate::{generator, utils::CustomError, utils::Example};
+use html2text::from_read;
 use serde_json::Value;
 
 const LC_PROBLEM_URL_PREFIX: &str = "https://leetcode.com/problems/";
+
+pub fn validate_language(language: &String) -> Result<(), CustomError> {
+    if generator::LANGUAGE_LIST.contains(&language.as_str()) {
+        Ok(())
+    } else {
+        Err(CustomError::from_str("Language not supported yet"))
+    }
+}
 
 pub fn get_title_slug(problem_url: &String) -> Result<String, CustomError> {
     let url_parts: Vec<&str> = problem_url.split('/').collect();
@@ -9,22 +18,40 @@ pub fn get_title_slug(problem_url: &String) -> Result<String, CustomError> {
     // Example URL: https://leetcode.com/problems/remove-duplicates-from-sorted-array/?envType=study-plan-v2&envId=top-interview-150
     // ["https:", "", "leetcode.com", "problems", "remove-duplicates-from-sorted-array", "?envType=study-plan-v2&envId=top-interview-150\n"]
     if !problem_url.starts_with(LC_PROBLEM_URL_PREFIX) || url_parts.len() < 5 {
-        return Err(CustomError::from(
-            "Invalid URL. This doesn't look like a Leetcode Problem URL.".to_string(),
-        ));
+        Err(CustomError::from_str(
+            "Invalid URL. This doesn't look like a Leetcode Problem URL.",
+        ))
+    } else {
+        Ok(url_parts[4].to_string())
+    }
+}
+
+fn get_text_from_html(question_content_as_html: &String) -> String {
+    // TODO: Maybe make width configurable with language
+    // Currently width=120 to avoid examples being cut from the middle
+    // Generated description & code may be formatted anyway
+    from_read(question_content_as_html.as_bytes(), 120)
+}
+
+pub fn get_examples(description: &String) -> Vec<Example> {
+    const INPUT_PREFIX: &str = "**Input:**";
+    const OUTPUT_PREFIX: &str = "**Output:**";
+
+    let mut examples: Vec<Example> = vec![];
+    let mut input: &str = "";
+    let mut output: &str;
+
+    let lines = description.lines();
+    for line in lines {
+        if line.starts_with(INPUT_PREFIX) {
+            input = &line[(INPUT_PREFIX.len() + 1)..];
+        } else if line.starts_with(OUTPUT_PREFIX) {
+            output = &line[(OUTPUT_PREFIX.len() + 1)..];
+            examples.push(Example::from(input, output));
+        }
     }
 
-    Ok(url_parts[4].to_string())
-}
-
-fn clean_description(question_content: &String) -> String {
-    // let mut clean_question_content: String;
-
-    question_content.to_string()
-}
-
-pub fn get_examples(description: &String) -> String {
-    "".to_string()
+    examples
 }
 
 pub fn parse_question_content(
@@ -42,16 +69,14 @@ pub fn parse_question_content(
             .get("content")
             .is_none()
     {
-        Err(CustomError::from(
-            "Couldn't read response JSON data.".to_string(),
-        ))?
+        Err(CustomError::from_str("Couldn't read response JSON data."))?
     } else {
-        let q_content = parsed_json["data"]["question"]["content"]
+        let question_content_html = parsed_json["data"]["question"]["content"]
             .as_str()
             .unwrap()
             .to_string();
 
-        Ok(clean_description(&q_content))
+        Ok(get_text_from_html(&question_content_html))
     }
 }
 
@@ -74,9 +99,7 @@ pub fn parse_starter_code(
             .get("questionFrontendId")
             .is_none()
     {
-        return Err(CustomError::from(
-            "Couldn't read response JSON data.".to_string(),
-        ))?;
+        return Err(CustomError::from_str("Couldn't read response JSON data."))?;
     } else {
         problem_number = parsed_json["data"]["question"]["questionFrontendId"]
             .as_str()
@@ -92,15 +115,11 @@ pub fn parse_starter_code(
         .get("codeSnippets")
         .is_none()
     {
-        return Err(CustomError::from(
-            "Couldn't read response JSON data.".to_string(),
-        ))?;
+        return Err(CustomError::from_str("Couldn't read response JSON data."))?;
     }
 
     if !parsed_json["data"]["question"]["codeSnippets"].is_array() {
-        return Err(CustomError::from(
-            "Couldn't read response JSON data.".to_string(),
-        ))?;
+        return Err(CustomError::from_str("Couldn't read response JSON data."))?;
     }
 
     let code_snippets: &Vec<Value> = parsed_json["data"]["question"]["codeSnippets"]
@@ -119,8 +138,8 @@ pub fn parse_starter_code(
     }
 
     if !extnsn_found {
-        return Err(CustomError::from("Language not supported yet".to_string()))?;
+        Err(CustomError::from_str("Language not supported yet"))?
+    } else {
+        Ok((starter_code, problem_number))
     }
-
-    Ok((starter_code, problem_number))
 }
