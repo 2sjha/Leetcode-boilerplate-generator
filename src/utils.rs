@@ -5,13 +5,28 @@ pub const LANG_RUST: &str = "rust";
 pub const LANG_JAVA: &str = "java";
 pub const LANG_PYTHON: &str = "python3";
 
-pub const EXTNSN_CPP: &str = "cpp";
-pub const EXTNSN_RUST: &str = "rs";
-pub const EXTNSN_JAVA: &str = "java";
-pub const EXTNSN_PYTHON: &str = "py";
-pub const EXTNSN_TXT: &str = "txt";
+const EXTNSN_CPP: &str = "cpp";
+const EXTNSN_RUST: &str = "rs";
+const EXTNSN_JAVA: &str = "java";
+const EXTNSN_PYTHON: &str = "py";
+const EXTNSN_TXT: &str = "txt";
 
 pub const LANGUAGE_LIST: [&str; 4] = [LANG_CPP, LANG_RUST, LANG_JAVA, LANG_PYTHON];
+
+pub const IN_INT: &str = "integer";
+pub const IN_STRING: &str = "string";
+pub const IN_LIST_INT: &str = "integer[]";
+pub const IN_LIST_STRING: &str = "string[]";
+pub const IN_MATRIX_INT: &str = "integer[][]";
+pub const IN_MATRIX_CHAR: &str = "character[][]";
+
+pub const OUT_VOID: &str = "void";
+pub const OUT_INT: &str = "integer";
+pub const OUT_BOOL: &str = "boolean";
+pub const OUT_STRING: &str = "string";
+pub const OUT_LIST_INT: &str = "list<integer>";
+pub const OUT_LIST_INT2: &str = "integer[]";
+pub const OUT_LIST_STRING: &str = "list<string>";
 
 pub fn extension_lang_map(language: &String) -> &str {
     match language.to_ascii_lowercase().as_str() {
@@ -56,9 +71,11 @@ impl std::error::Error for CustomError {}
 pub struct Example {
     // Ordered list of input variables and their types
     input_var_types: Vec<(String, String)>,
+    // Map of input variables and values
     input_var_values: HashMap<String, String>,
     output_type: String,
     output_value: String,
+    func_name: String,
 }
 
 impl Example {
@@ -67,36 +84,62 @@ impl Example {
         input_var_values: HashMap<String, String>,
         output_type: String,
         output_value: String,
+        func_name: String,
     ) -> Example {
         Example {
             input_var_types,
             input_var_values,
             output_type,
             output_value,
+            func_name,
         }
     }
 
-    pub fn to_string(&self, example_number: String) -> String {
+    pub fn to_string(&self, example_number: usize) -> String {
         let mut example_string: String = String::new();
-        for i in 0..self.input_var_types.len() {
-            let (input_var_name, input_var_type) = &self.input_var_types[i]; 
-            example_string += input_var_type.as_str();
-            example_string += " ";
-            example_string += input_var_name.as_str();
-            example_string += "_";
-            example_string += example_number.as_str();
-            example_string += " = ";
-            example_string += self.input_var_values[input_var_name].as_str();
-            example_string += ";\n";
 
-            example_string += self.output_type.as_str();
-            example_string += " res";
-            example_string += "_";
-            example_string += example_number.as_str();
-            example_string += " = ";
-            example_string += self.output_value.as_str();
-            example_string += ";\n\n";
+        // input_type_1 input_var_i_1 = input_val_i_1;
+        // ..
+        // input_type_n input_var_i_n = input_val_i_n;
+        for i in 0..self.input_var_types.len() {
+            let (input_var_name, input_var_type) = &self.input_var_types[i];
+            example_string += format!(
+                "\t{} {}_{} = {};\n",
+                input_var_type,
+                input_var_name,
+                example_number,
+                self.input_var_values[input_var_name].as_str()
+            )
+            .as_str();
         }
+        
+        // return_type output_i = output_val_i;
+        example_string += format!(
+            "\t{} expected_{} = {};\n",
+            self.output_type, example_number, self.output_value
+        )
+        .as_str();
+
+        // return_type output_i = func_name(input_var_i_1, input_var_i_2, .. input_var_i_n);
+        example_string += format!(
+            "\t{} output_{} = {}(",
+            self.output_type, example_number, self.func_name
+        )
+        .as_str();
+        let mut i: usize = 0;
+        while i < self.input_var_types.len() - 1 {
+            let input_var_name_type = &self.input_var_types[i];
+            example_string += format!("{}_{}, ", input_var_name_type.0, example_number).as_str();
+            i += 1;
+        }
+        example_string += format!("{}_{});\n", &self.input_var_types[i].0, example_number).as_str();
+
+        // assert(output_i == expected_i);
+        example_string += format!(
+            "\tassert(output_{} == expected_{});\n\n",
+            example_number, example_number
+        )
+        .as_str();
 
         example_string
     }
