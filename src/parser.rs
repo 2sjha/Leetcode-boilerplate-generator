@@ -1,11 +1,12 @@
-use crate::{generator, utils::CustomError, utils::Example};
+use crate::utils::{self, CustomError, Example};
 use html2text::from_read;
 use serde_json::Value;
+use std::collections::HashMap;
 
 const LC_PROBLEM_URL_PREFIX: &str = "https://leetcode.com/problems/";
 
 pub fn validate_language(language: &String) -> Result<(), CustomError> {
-    if generator::LANGUAGE_LIST.contains(&language.as_str()) {
+    if utils::LANGUAGE_LIST.contains(&language.as_str()) {
         Ok(())
     } else {
         Err(CustomError::from_str("Language not supported yet"))
@@ -33,25 +34,99 @@ fn get_text_from_html(question_content_as_html: &String) -> String {
     from_read(question_content_as_html.as_bytes(), 120)
 }
 
-pub fn get_examples(description: &String) -> Vec<Example> {
-    const INPUT_PREFIX: &str = "**Input:**";
+pub fn parse_output_values_from_description(description: &String) -> Vec<String> {
+    let mut output_values: Vec<String> = Vec::new();
     const OUTPUT_PREFIX: &str = "**Output:**";
-
-    let mut examples: Vec<Example> = vec![];
-    let mut input: &str = "";
-    let mut output: &str;
 
     let lines = description.lines();
     for line in lines {
-        if line.starts_with(INPUT_PREFIX) {
-            input = &line[(INPUT_PREFIX.len() + 1)..];
-        } else if line.starts_with(OUTPUT_PREFIX) {
-            output = &line[(OUTPUT_PREFIX.len() + 1)..];
-            examples.push(Example::from(input, output));
+        if line.starts_with(OUTPUT_PREFIX) {
+            let output: &str = &line[(OUTPUT_PREFIX.len() + 1)..];
+            output_values.push(String::from(output));
         }
     }
 
-    examples
+    output_values
+}
+
+pub fn get_examples(
+    examples_data: &String,
+    output_values: Vec<String>,
+) -> Result<Vec<Example>, Box<dyn std::error::Error>> {
+    let parsed_json: Value = serde_json::from_str(examples_data)?;
+
+    if parsed_json.get("data").is_none()
+        || parsed_json.get("data").unwrap().get("question").is_none()
+        || parsed_json
+            .get("data")
+            .unwrap()
+            .get("question")
+            .unwrap()
+            .get("exampleTestcaseList")
+            .is_none()
+        || parsed_json
+            .get("data")
+            .unwrap()
+            .get("question")
+            .unwrap()
+            .get("metaData")
+            .is_none()
+    {
+        Err(CustomError::from_str("Couldn't read response JSON data."))?
+    }
+
+    let metadata_str = parsed_json["data"]["question"]["metaData"]
+        .as_str()
+        .unwrap();
+
+    let metadata_json: Value = serde_json::from_str(metadata_str)?;
+    if metadata_json.get("params").is_none()
+        || !metadata_json["params"].is_array()
+        || metadata_json.get("return").is_none()
+    {
+        Err(CustomError::from_str("Couldn't read response JSON data."))?
+    }
+
+    if !parsed_json["data"]["question"]["exampleTestcaseList"].is_array() {
+        Err(CustomError::from_str("Couldn't read response JSON data."))?
+    }
+
+    let mut input_var_types: Vec<(String, String)> = Vec::new();
+    let mut input_var_values: HashMap<String, String> = HashMap::new();
+    let output_type: String = String::from(metadata_json["return"]["type"].as_str().unwrap());
+
+    for param in metadata_json["params"].as_array().unwrap() {
+        input_var_types.push((
+            String::from(param["name"].as_str().unwrap()),
+            String::from(param["type"].as_str().unwrap()),
+        ));
+    }
+
+    let mut examples: Vec<Example> = Vec::new();
+    let mut i: usize = 0;
+    for example_testcase in parsed_json["data"]["question"]["exampleTestcaseList"]
+        .as_array()
+        .unwrap()
+    {
+        let example_testcase: &str = example_testcase.as_str().unwrap();
+        let testcase_values: Vec<&str> = example_testcase.split("\n").collect();
+        for i in 0..testcase_values.len() {
+            input_var_values.insert(
+                String::from(&input_var_types[i].0),
+                String::from(testcase_values[i]),
+            );
+        }
+        examples.push(Example::from(
+            input_var_types.clone(),
+            input_var_values.clone(),
+            output_type.clone(),
+            output_values[i].clone(),
+        ));
+        i += 1;
+        input_var_values.clear();
+    }
+
+    Ok(examples)
 }
 
 pub fn parse_question_content(

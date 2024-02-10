@@ -1,34 +1,4 @@
-use crate::{utils::Example, utils::CustomError};
-
-pub const LANG_CPP: &str = "cpp";
-pub const LANG_RUST: &str = "rust";
-pub const LANG_JAVA: &str = "java";
-pub const LANG_PYTHON: &str = "python3";
-
-pub const EXTNSN_CPP: &str = "cpp";
-pub const EXTNSN_RUST: &str = "rs";
-pub const EXTNSN_JAVA: &str = "java";
-pub const EXTNSN_PYTHON: &str = "py";
-pub const EXTNSN_TXT: &str = "txt";
-
-pub const LANGUAGE_LIST: [&str; 4] = [LANG_CPP, LANG_RUST, LANG_JAVA, LANG_PYTHON];
-
-pub fn extension_lang_map(language: &String) -> &str {
-    match language.to_ascii_lowercase().as_str() {
-        LANG_CPP => EXTNSN_CPP,
-        LANG_RUST => EXTNSN_RUST,
-        LANG_JAVA => EXTNSN_JAVA,
-        LANG_PYTHON => EXTNSN_PYTHON,
-        _ => EXTNSN_TXT,
-    }
-}
-
-pub fn language_list_string() -> String {
-    let mut list_string: String = format!("{:?}", LANGUAGE_LIST);
-    list_string = list_string[1..list_string.len() - 1].to_string();
-
-    list_string
-}
+use crate::utils::{self, Example};
 
 pub fn generate_driver_code(
     examples: Vec<Example>,
@@ -36,10 +6,10 @@ pub fn generate_driver_code(
     language: &String,
 ) -> String {
     match language.to_ascii_lowercase().as_str() {
-        LANG_CPP => cpp_driver_code(examples, starter_code),
-        LANG_RUST => rust_driver_code(examples, starter_code),
-        LANG_JAVA => java_driver_code(examples, starter_code),
-        LANG_PYTHON => python_driver_code(examples, starter_code),
+        utils::LANG_CPP => cpp_driver_code(examples, starter_code),
+        utils::LANG_RUST => rust_driver_code(examples, starter_code),
+        utils::LANG_JAVA => java_driver_code(examples, starter_code),
+        utils::LANG_PYTHON => python_driver_code(examples, starter_code),
         _ => "".to_string(), // Won't happen
     }
 }
@@ -50,10 +20,10 @@ pub fn generate_description_as_comment(
     language: &String,
 ) -> String {
     match language.to_ascii_lowercase().as_str() {
-        LANG_CPP => generic_description_comment(problem_url, description),
-        LANG_RUST => generic_description_comment(problem_url, description),
-        LANG_JAVA => generic_description_comment(problem_url, description),
-        LANG_PYTHON => python_description_comment(problem_url, description),
+        utils::LANG_CPP => generic_description_comment(problem_url, description),
+        utils::LANG_RUST => generic_description_comment(problem_url, description),
+        utils::LANG_JAVA => generic_description_comment(problem_url, description),
+        utils::LANG_PYTHON => python_description_comment(problem_url, description),
         _ => "".to_string(), // Won't happen
     }
 }
@@ -80,19 +50,6 @@ fn python_description_comment(problem_url: &String, description: &String) -> Str
     desc_comment
 }
 
-fn cpp_driver_code(examples: Vec<Example>, starter_code: &String) -> String {
-    let mut driver_code: String = String::new();
-    driver_code += starter_code;
-    driver_code += "\n\n";
-    for example in examples {
-        driver_code += example.get_input().as_str();
-        driver_code += "\n";
-        driver_code += example.get_output().as_str();
-    }
-
-    driver_code
-}
-
 fn rust_driver_code(examples: Vec<Example>, starter_code: &String) -> String {
     let mut driver_code: String = String::new();
     driver_code += "struct Solution;\n";
@@ -100,31 +57,69 @@ fn rust_driver_code(examples: Vec<Example>, starter_code: &String) -> String {
     driver_code += "\n\n";
     driver_code += "fn main() {\n\n";
 
-    if analyze_example(&examples[0]).is_err() {
+    // Cant parse 1st example or create code for it
+    // Then problem code/type might be too specific
+    // Thus write them as comment.
+    let code_example_1 = rust_code_for_example(&examples[0], 1, starter_code);
+    if code_example_1.is_none() {
+        eprintln!("Couldn't understand example. Writing examples as comment. You're on your own for this one.");
         driver_code += examples_as_comment(examples).as_str();
     } else {
-        // driver_code += examples_as_rust_code(examples, starter_code).as_str();
+        driver_code += code_example_1.unwrap().as_str();
+        if examples.len() >= 2 {
+            for i in 1..examples.len() {
+                driver_code += rust_code_for_example(&examples[i], i + 1, starter_code)
+                    .unwrap()
+                    .as_str();
+            }
+        }
     }
 
     driver_code += "}\n";
     driver_code
 }
 
+fn rust_code_for_example(
+    example: &Example,
+    example_number: usize,
+    starter_code: &String,
+) -> Option<String> {
+    Some(example.to_string(example_number.to_string()))
+}
+
+fn cpp_driver_code(examples: Vec<Example>, starter_code: &String) -> String {
+    let mut driver_code: String = String::new();
+    driver_code += starter_code;
+    driver_code += "\n\n";
+    let mut i: usize = 0;
+    while i < examples.len() {
+        let example: &Example = &examples[i];
+        driver_code += example.to_string((i + 1).to_string()).as_str();
+        i += 1;
+    }
+
+    driver_code
+}
+
+fn cpp_code_for_example(example: &Example) -> Option<String> {
+    None
+}
+
 fn python_driver_code(examples: Vec<Example>, starter_code: &String) -> String {
     cpp_driver_code(examples, starter_code)
+}
+
+fn python_code_for_example(example: &Example) -> Option<String> {
+    None
 }
 
 fn java_driver_code(examples: Vec<Example>, starter_code: &String) -> String {
     cpp_driver_code(examples, starter_code)
 }
 
-fn analyze_example(example: &Example) -> Result<(), Box<dyn std::error::Error>> {
-    Err(CustomError::from_str(
-        "Couldn't understand example. Generating incomplete driver code.",
-    ))?
+fn java_code_for_example(example: &Example) -> Option<String> {
+    None
 }
-
-
 
 fn examples_as_comment(examples: Vec<Example>) -> String {
     let mut examples_comment: String = String::new();
@@ -133,17 +128,13 @@ fn examples_as_comment(examples: Vec<Example>) -> String {
     let mut example: &Example;
     while i < examples.len() - 1 {
         example = &examples[i];
-        examples_comment += example.get_input().as_str();
-        examples_comment += "\n";
-        examples_comment += example.get_output().as_str();
+        examples_comment += example.to_string((i + 1).to_string()).as_str();
         examples_comment += "\n\n";
         i += 1;
     }
 
     example = &examples[i];
-    examples_comment += example.get_input().as_str();
-    examples_comment += "\n";
-    examples_comment += example.get_output().as_str();
+    examples_comment += example.to_string((i + 1).to_string()).as_str();
     examples_comment += "\n*/\n\n";
 
     examples_comment

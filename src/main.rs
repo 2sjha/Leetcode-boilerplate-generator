@@ -24,7 +24,7 @@ fn main() {
 
         print!(
             "Language (Supported Languages are {}): ",
-            generator::language_list_string()
+            utils::language_list_string()
         );
         let _ = io::stdout().flush();
         language = String::new();
@@ -56,12 +56,14 @@ fn parse_and_generate(
     // Make API Calls to fetch question content and editor code
     let question_content: String = api_calls::get_question_content(&problem_title)?;
     let question_editor_data: String = api_calls::get_question_editor_data(&problem_title)?;
+    let examples_data: String = api_calls::get_examples_data(&problem_title)?;
 
     // Parse the JSON responses
     let mut description: String = parser::parse_question_content(&question_content)?;
+    let output_values: Vec<String> = parser::parse_output_values_from_description(&description);
     let (starter_code, problem_number) =
         parser::parse_starter_code(&question_editor_data, &language)?;
-    let examples: Vec<utils::Example> = parser::get_examples(&description);
+    let examples: Vec<utils::Example> = parser::get_examples(&examples_data, output_values)?;
 
     // Generate full driver code and save it in a file
     description = generator::generate_description_as_comment(&problem_url, &description, &language);
@@ -70,7 +72,7 @@ fn parse_and_generate(
         "{}-{}.{}",
         problem_number,
         problem_title,
-        generator::extension_lang_map(&language)
+        utils::extension_lang_map(&language)
     );
     let mut file: File = File::create(&filename)?;
     let _ = file.write_all(description.as_bytes());

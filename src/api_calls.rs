@@ -26,8 +26,6 @@ pub async fn get_question_content(
         query questionContent($titleSlug: String!) {
             question(titleSlug: $titleSlug) {
                 content
-                mysqlSchemas
-                dataSchemas
             }
         }
     "#;
@@ -42,7 +40,7 @@ pub async fn get_question_content(
 
     let client = Client::new();
     let response = client
-        .post(format!("{}/{}", LC_GQL_URL, title_slug))
+        .post(LC_GQL_URL)
         .headers(get_headers())
         .json(&request_body)
         .send()
@@ -74,10 +72,6 @@ pub async fn get_question_editor_data(
                     langSlug
                     code
                 }
-                envInfo
-                enableRunCode
-                hasFrontendPreview
-                frontendPreviews
             }
         }
     "#;
@@ -92,7 +86,51 @@ pub async fn get_question_editor_data(
 
     let client = Client::new();
     let response = client
-        .post(format!("{}/{}", LC_GQL_URL, title_slug))
+        .post(LC_GQL_URL)
+        .headers(get_headers())
+        .json(&request_body)
+        .send()
+        .await?;
+
+    if response.status().is_success() {
+        let body = response.text().await?;
+        debug!("{}", body);
+        return Ok(body);
+    } else {
+        return Err(CustomError::from(format!(
+            "GraphQL request failed with status code: {}",
+            response.status()
+        )))?;
+    }
+}
+
+#[tokio::main]
+pub async fn get_examples_data(
+    title_slug: &String,
+) -> Result<String, Box<dyn std::error::Error>> {
+    let query = r#"
+        query consolePanelConfig($titleSlug: String!) {
+            question(titleSlug: $titleSlug) {
+                questionId
+                questionFrontendId
+                questionTitle
+                exampleTestcaseList
+                metaData
+            }
+        }
+    "#;
+
+    let variables = json!({
+        "titleSlug": title_slug
+    });
+    let request_body = json!({
+        "query": query,
+        "variables": variables
+    });
+
+    let client = Client::new();
+    let response = client
+        .post(LC_GQL_URL)
         .headers(get_headers())
         .json(&request_body)
         .send()
