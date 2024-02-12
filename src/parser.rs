@@ -49,6 +49,32 @@ pub fn parse_output_values_from_description(description: &String) -> Vec<String>
     output_values
 }
 
+pub fn parse_func_name_from_starter_code(starter_code: &String) -> String {
+    let mut func_name: String = String::new();
+    for line in starter_code.lines() {
+        if line.contains('(') {
+            let line_parts: Vec<&str> = line.split(' ').collect();
+            for word in line_parts {
+                if word.contains('(') {
+                    for c in word.chars() {
+                        if c == '(' {
+                            break;
+                        } else {
+                            func_name.push(c);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if func_name.is_empty() {
+        "func".to_string()
+    } else {
+        func_name
+    }
+}
+
 pub fn get_examples(
     examples_data: &String,
     output_values: Vec<String>,

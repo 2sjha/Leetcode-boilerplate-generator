@@ -95,6 +95,26 @@ impl Example {
         }
     }
 
+    pub fn get_input_var_types(&self) -> Vec<(String, String)> {
+        self.input_var_types.clone()
+    }
+
+    pub fn get_input_var_values(&self) -> HashMap<String, String> {
+        self.input_var_values.clone()
+    }
+
+    pub fn get_output_type(&self) -> String {
+        self.output_type.clone()
+    }
+
+    pub fn get_output_value(&self) -> String {
+        self.output_value.clone()
+    }
+
+    pub fn get_func_name(&self) -> String {
+        self.func_name.clone()
+    }
+
     pub fn to_string(&self, example_number: usize) -> String {
         let mut example_string: String = String::new();
 

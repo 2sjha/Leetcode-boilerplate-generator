@@ -44,7 +44,7 @@ fn main() {
         eprintln!("Error: {}", res.unwrap_err().to_string());
     } else {
         println!(
-            "\nFile with driver code generated successfully. You want to format it according to your preferrence."
+            "\nFile with driver code generated successfully. You may want to format it according to your preferrence."
         );
     }
 }
