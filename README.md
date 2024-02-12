@@ -15,7 +15,9 @@ Generated boilerplate code for C++
 ## How to Use
 
 - `./lc-boilerplate-generator <leetcode-problem-url> <language>` (supported languages: `cpp`, `rust`, `java`, `python3`)
+
 Or
+
 - `./lc-boilerplate-generator` and it will ask for both these input.
 
 ## Setup
