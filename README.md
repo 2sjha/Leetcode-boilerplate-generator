@@ -4,7 +4,7 @@ Ever had to debug Leetcode problems? Leetcode has debugging behind their paywall
 This can generate compilable driver code in C++ & Rust with example inputs and assertions against their expected outputs.
 
 [Demo problem link](https://leetcode.com/problems/longest-substring-without-repeating-characters/description/)
-![Demo-Rust](./assets/demo-rs.png)
+![Demo-Rust](./assets/demo-rust.png)
 ![Demo-C++](./assets/demo-cpp.png)
 
 
