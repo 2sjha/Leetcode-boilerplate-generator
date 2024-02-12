@@ -121,7 +121,6 @@ pub fn get_examples(
     let mut input_var_types: Vec<(String, String)> = Vec::new();
     let mut input_var_values: HashMap<String, String> = HashMap::new();
     let output_type: String = String::from(metadata_json["return"]["type"].as_str().unwrap());
-    let func_name: String = String::from(metadata_json["name"].as_str().unwrap());
 
     for param in metadata_json["params"].as_array().unwrap() {
         input_var_types.push((
@@ -149,7 +148,6 @@ pub fn get_examples(
             input_var_values.clone(),
             output_type.clone(),
             output_values[i].clone(),
-            func_name.clone(),
         ));
         i += 1;
         input_var_values.clear();

@@ -27,6 +27,7 @@ pub const OUT_STRING: &str = "string";
 pub const OUT_LIST_INT: &str = "list<integer>";
 pub const OUT_LIST_INT2: &str = "integer[]";
 pub const OUT_LIST_STRING: &str = "list<string>";
+pub const OUT_MATRIX_INT: &str = "integer[][]";
 
 pub fn extension_lang_map(language: &String) -> &str {
     match language.to_ascii_lowercase().as_str() {
@@ -75,7 +76,6 @@ pub struct Example {
     input_var_values: HashMap<String, String>,
     output_type: String,
     output_value: String,
-    func_name: String,
 }
 
 impl Example {
@@ -84,14 +84,12 @@ impl Example {
         input_var_values: HashMap<String, String>,
         output_type: String,
         output_value: String,
-        func_name: String,
     ) -> Example {
         Example {
             input_var_types,
             input_var_values,
             output_type,
             output_value,
-            func_name,
         }
     }
 
@@ -111,10 +109,6 @@ impl Example {
         self.output_value.clone()
     }
 
-    pub fn get_func_name(&self) -> String {
-        self.func_name.clone()
-    }
-
     pub fn to_string(&self, example_number: usize) -> String {
         let mut example_string: String = String::new();
 
@@ -132,7 +126,7 @@ impl Example {
             )
             .as_str();
         }
-        
+
         // return_type output_i = output_val_i;
         example_string += format!(
             "\t{} expected_{} = {};\n",
@@ -141,11 +135,8 @@ impl Example {
         .as_str();
 
         // return_type output_i = func_name(input_var_i_1, input_var_i_2, .. input_var_i_n);
-        example_string += format!(
-            "\t{} output_{} = {}(",
-            self.output_type, example_number, self.func_name
-        )
-        .as_str();
+        example_string +=
+            format!("\t{} output_{} = func(", self.output_type, example_number,).as_str();
         let mut i: usize = 0;
         while i < self.input_var_types.len() - 1 {
             let input_var_name_type = &self.input_var_types[i];

@@ -78,8 +78,12 @@ fn rust_code_for_example(
     let mut i: usize = 0;
     while i < example.get_input_var_types().len() - 1 {
         let input_var_name_type = &example.get_input_var_types()[i];
-        example_string +=
-            format!("{}_{}, ", snake_case(&input_var_name_type.0), example_number).as_str();
+        example_string += format!(
+            "{}_{}, ",
+            snake_case(&input_var_name_type.0),
+            example_number
+        )
+        .as_str();
         i += 1;
     }
     example_string += format!(
@@ -181,17 +185,7 @@ fn rust_code_for_output_var(lc_var_type: &String, var_value: &String) -> Option<
     } else if lc_var_type == utils::OUT_STRING {
         rust_var_type = String::from("String");
         rust_var_value = format!("String::from({})", var_value);
-    } else if lc_var_type == utils::OUT_LIST_INT {
-        rust_var_type = String::from("Vec<i32>");
-        rust_var_value = String::new();
-        for c in var_value.chars() {
-            if c == '[' {
-                rust_var_value += "vec!["
-            } else {
-                rust_var_value.push(c);
-            }
-        }
-    } else if lc_var_type == utils::OUT_LIST_INT2 {
+    } else if lc_var_type == utils::OUT_LIST_INT || lc_var_type == utils::OUT_LIST_INT2 {
         rust_var_type = String::from("Vec<i32>");
         rust_var_value = String::new();
         for c in var_value.chars() {
@@ -211,6 +205,16 @@ fn rust_code_for_output_var(lc_var_type: &String, var_value: &String) -> Option<
                 rust_var_value += ".to_string(),"
             } else if c == ']' {
                 rust_var_value += ".to_string()]"
+            } else {
+                rust_var_value.push(c);
+            }
+        }
+    } else if lc_var_type == utils::OUT_MATRIX_INT {
+        rust_var_type = String::from("Vec<Vec<i32>>");
+        rust_var_value = String::new();
+        for c in var_value.chars() {
+            if c == '[' {
+                rust_var_value += "vec!["
             } else {
                 rust_var_value.push(c);
             }
