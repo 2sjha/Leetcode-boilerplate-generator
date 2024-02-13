@@ -4,3 +4,6 @@
 *.cpp
 *.java
 *.py
+
+# Generated Binary
+lc-boilerplate-generator

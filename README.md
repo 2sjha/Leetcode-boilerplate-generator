@@ -1,6 +1,6 @@
 # Leetcode Boilerplate Generator
 
-Ever had to debug Leetcode problems? Leetcode has debugging behind their paywall. Running & Debugging a Leetcode problem requires you to write the driver code that will call the problem function with example inputs & outputs, `lc-boilerplate-generator` can do just that for you.
+Ever had to debug Leetcode problems? Debugging a Leetcode problem on their website is behind a paywall. And running & debugging a Leetcode problem locally requires you to write the driver code that will call the problem function with example inputs & outputs, `lc-boilerplate-generator` can do just that for you.
 This can generate compilable driver code in C++ & Rust with example inputs and assertions against their expected outputs.
 
 [Demo problem link](https://leetcode.com/problems/longest-substring-without-repeating-characters/description/)
