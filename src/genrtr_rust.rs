@@ -209,7 +209,7 @@ fn rust_code_for_output_var(lc_var_type: &String, var_value: &String) -> Option<
                 rust_var_value.push(c);
             }
         }
-    } else if lc_var_type == utils::OUT_MATRIX_INT {
+    } else if lc_var_type == utils::OUT_MATRIX_INT || lc_var_type == utils::OUT_MATRIX_INT2 {
         rust_var_type = String::from("Vec<Vec<i32>>");
         rust_var_value = String::new();
         for c in var_value.chars() {

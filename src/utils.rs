@@ -28,6 +28,7 @@ pub const OUT_LIST_INT: &str = "list<integer>";
 pub const OUT_LIST_INT2: &str = "integer[]";
 pub const OUT_LIST_STRING: &str = "list<string>";
 pub const OUT_MATRIX_INT: &str = "integer[][]";
+pub const OUT_MATRIX_INT2: &str = "list<list<integer>>";
 
 pub fn extension_lang_map(language: &String) -> &str {
     match language.to_ascii_lowercase().as_str() {

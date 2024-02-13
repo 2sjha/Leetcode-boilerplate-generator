@@ -182,12 +182,13 @@ fn cpp_code_for_output_var(lc_var_type: &String, var_value: &String) -> Option<(
         || lc_var_type == utils::OUT_LIST_INT2
         || lc_var_type == utils::OUT_LIST_STRING
         || lc_var_type == utils::OUT_MATRIX_INT
+        || lc_var_type == utils::OUT_MATRIX_INT2
     {
         if lc_var_type == utils::OUT_LIST_INT || lc_var_type == utils::OUT_LIST_INT2 {
             cpp_var_type = String::from("vector<int>");
         } else if lc_var_type == utils::OUT_LIST_STRING {
             cpp_var_type = String::from("vector<string>");
-        } else if lc_var_type == utils::OUT_MATRIX_INT {
+        } else if lc_var_type == utils::OUT_MATRIX_INT || lc_var_type == utils::OUT_MATRIX_INT2 {
             cpp_var_type = String::from("vector<vector<int>>");
         } else {
             return None; // Won't happen
@@ -225,7 +226,7 @@ fn print_output(lc_var_type: &String, example_number: usize) -> String {
         || lc_var_type == utils::OUT_LIST_STRING
     {
         print_output = format!("\tprintArray(output_{});\n", example_number);
-    } else if lc_var_type == utils::OUT_MATRIX_INT {
+    } else if lc_var_type == utils::OUT_MATRIX_INT || lc_var_type == utils::OUT_MATRIX_INT2{
         print_output = format!("\tprint2Dmatrix(output_{});\n", example_number);
     } else {
         print_output = "".to_string();
