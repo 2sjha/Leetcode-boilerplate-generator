@@ -1,11 +1,11 @@
 mod api_calls;
 mod generator;
+mod genrtr_cpp;
+mod genrtr_java;
+mod genrtr_python;
+mod genrtr_rust;
 mod parser;
 mod utils;
-mod genrtr_rust;
-mod genrtr_cpp;
-mod genrtr_python;
-mod genrtr_java;
 use std::env;
 use std::fs::File;
 use std::io;
@@ -50,11 +50,12 @@ fn main() {
 }
 
 fn parse_and_generate(
-    problem_url: String,
+    mut problem_url: String,
     language: String,
 ) -> Result<(), Box<dyn std::error::Error>> {
     // Fetch problem title slug from the URL
     let problem_title: String = parser::get_title_slug(&problem_url)?;
+    problem_url = parser::trim_problem_url(&problem_url);
     parser::validate_language(&language)?;
 
     // Make API Calls to fetch question content and editor code
@@ -70,7 +71,8 @@ fn parse_and_generate(
     let examples: Vec<utils::Example> = parser::get_examples(&examples_data, output_values)?;
 
     // Generate full driver code and save it in a file
-    description = generator::generate_description_as_comment(&problem_url, &description, &language);
+    description =
+        generator::generate_description_as_comment(&mut problem_url, &description, &language);
     let driver_code: String = generator::generate_driver_code(examples, &starter_code, &language);
     let filename: String = format!(
         "{}-{}.{}",

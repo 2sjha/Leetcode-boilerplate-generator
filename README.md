@@ -1,9 +1,12 @@
 # Leetcode Boilerplate Generator
 
 Ever had to debug Leetcode problems? Debugging a Leetcode problem on their website is behind a paywall. And running & debugging a Leetcode problem locally requires you to write the driver code that will call the problem function with example inputs & outputs, `lc-boilerplate-generator` can do just that for you.
-This can generate compilable driver code in C++ & Rust with example inputs and assertions against their expected outputs.
+This can generate compilable driver code in *C++* and *Rust* with example inputs and assertions against their expected outputs. If the problem inputs and/or outputs are primitive data types or 1-D or 2-D arrays, then this can generate driver code for it.
 
-[Demo problem link](https://leetcode.com/problems/longest-substring-without-repeating-characters/description/)
+*Not Supported:*
+
+  - Problems based on dynamic data structures like Linked List, Tree are not supported
+  - Problems based on writing a class for a custom data structure.
 
 Generated boilerplate code for Rust
 ![Demo-Rust](./assets/demo-rust.png)

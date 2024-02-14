@@ -27,6 +27,11 @@ pub fn get_title_slug(problem_url: &String) -> Result<String, CustomError> {
     }
 }
 
+pub fn trim_problem_url(problem_url: &String) -> String {
+    let url_parts: Vec<&str> = problem_url.split('/').collect();
+    url_parts[0..5].join("/")
+}
+
 fn get_text_from_html(question_content_as_html: &String) -> String {
     // TODO: Maybe make width configurable with language
     // Currently width=120 to avoid examples being cut from the middle
