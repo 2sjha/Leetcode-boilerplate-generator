@@ -5,7 +5,7 @@ This can generate compilable driver code in **C++** and **Rust** with example in
 
 *Not Supported:*
 
-  - Problems based on dynamic data structures like Linked List, Tree are not supported
+  - Problems based on dynamic data structures like Linked List, Tree.
   - Problems based on writing a class for a custom data structure.
 
 Generated boilerplate code for Rust
