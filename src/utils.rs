@@ -2,14 +2,12 @@ use std::{collections::HashMap, fmt};
 
 pub const LANG_CPP: &str = "cpp";
 pub const LANG_RUST: &str = "rust";
-pub const LANG_PYTHON: &str = "python3";
 
 const EXTNSN_CPP: &str = "cpp";
 const EXTNSN_RUST: &str = "rs";
-const EXTNSN_PYTHON: &str = "py";
 const EXTNSN_TXT: &str = "txt";
 
-pub const LANGUAGE_LIST: [&str; 3] = [LANG_CPP, LANG_RUST, LANG_PYTHON];
+pub const LANGUAGE_LIST: [&str; 2] = [LANG_CPP, LANG_RUST];
 
 pub const IN_INT: &str = "integer";
 pub const IN_STRING: &str = "string";
@@ -32,7 +30,6 @@ pub fn extension_lang_map(language: &String) -> &str {
     match language.to_ascii_lowercase().as_str() {
         LANG_CPP => EXTNSN_CPP,
         LANG_RUST => EXTNSN_RUST,
-        LANG_PYTHON => EXTNSN_PYTHON,
         _ => EXTNSN_TXT,
     }
 }
