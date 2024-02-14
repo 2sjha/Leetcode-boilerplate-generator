@@ -1,4 +1,4 @@
-use crate::{genrtr_cpp, genrtr_python, genrtr_java, genrtr_rust, utils::{self, Example}};
+use crate::{genrtr_cpp, genrtr_rust, utils::{self, Example}};
 
 pub fn generate_driver_code(
     examples: Vec<Example>,
@@ -8,8 +8,6 @@ pub fn generate_driver_code(
     match language.to_ascii_lowercase().as_str() {
         utils::LANG_CPP => genrtr_cpp::cpp_driver_code(examples, starter_code),
         utils::LANG_RUST => genrtr_rust::rust_driver_code(examples, starter_code),
-        utils::LANG_JAVA => genrtr_java::java_driver_code(examples, starter_code),
-        utils::LANG_PYTHON => genrtr_python::python_driver_code(examples, starter_code),
         _ => "".to_string(), // Won't happen
     }
 }
@@ -22,8 +20,6 @@ pub fn generate_description_as_comment(
     match language.to_ascii_lowercase().as_str() {
         utils::LANG_CPP => generic_description_comment(problem_url, description),
         utils::LANG_RUST => generic_description_comment(problem_url, description),
-        utils::LANG_JAVA => generic_description_comment(problem_url, description),
-        utils::LANG_PYTHON => genrtr_python::python_description_comment(problem_url, description),
         _ => "".to_string(), // Won't happen
     }
 }

@@ -1,8 +1,6 @@
 mod api_calls;
 mod generator;
 mod genrtr_cpp;
-mod genrtr_java;
-mod genrtr_python;
 mod genrtr_rust;
 mod parser;
 mod utils;
