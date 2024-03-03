@@ -117,7 +117,7 @@ fn cpp_code_for_input_var(lc_var_type: &String, var_value: &String) -> Option<(S
                 cpp_var_value.push(c);
             }
         }
-    } else if lc_var_type == utils::IN_LIST_STRING {
+    } else if lc_var_type == utils::IN_LIST_STRING || lc_var_type == utils::IN_LIST_STRING2 {
         cpp_var_type = String::from("vector<string>");
         cpp_var_value = String::new();
         for c in var_value.chars() {
@@ -226,7 +226,7 @@ fn print_output(lc_var_type: &String, example_number: usize) -> String {
         || lc_var_type == utils::OUT_LIST_STRING
     {
         print_output = format!("\tprintArray(output_{});\n", example_number);
-    } else if lc_var_type == utils::OUT_MATRIX_INT || lc_var_type == utils::OUT_MATRIX_INT2{
+    } else if lc_var_type == utils::OUT_MATRIX_INT || lc_var_type == utils::OUT_MATRIX_INT2 {
         print_output = format!("\tprint2Dmatrix(output_{});\n", example_number);
     } else {
         print_output = "".to_string();
