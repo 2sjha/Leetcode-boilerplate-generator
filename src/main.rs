@@ -10,6 +10,7 @@ use std::io;
 use std::io::Write;
 use surf::Client;
 use surf_cookie_middleware::CookieMiddleware;
+use surf_retry::{ExponentialBackoff, RetryMiddleware};
 
 fn main() {
     env_logger::init();
@@ -59,7 +60,13 @@ fn parse_and_generate(
     parser::validate_language(&language)?;
 
     // Make API Calls to fetch question content and editor code
-    let client = Client::new().with(CookieMiddleware::new());
+    let retry_mw = RetryMiddleware::new(
+        3,
+        ExponentialBackoff::builder().build_with_max_retries(3),
+        1,
+    );
+    let cookies_mw = CookieMiddleware::new();
+    let client = Client::new().with(cookies_mw).with(retry_mw);
     let question_content: String = api_calls::get_question_content(&client, &problem_title)?;
     let question_editor_data: String =
         api_calls::get_question_editor_data(&client, &problem_title)?;
