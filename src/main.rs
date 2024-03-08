@@ -8,6 +8,8 @@ use std::env;
 use std::fs::File;
 use std::io;
 use std::io::Write;
+use surf::Client;
+use surf_cookie_middleware::CookieMiddleware;
 
 fn main() {
     env_logger::init();
@@ -57,9 +59,11 @@ fn parse_and_generate(
     parser::validate_language(&language)?;
 
     // Make API Calls to fetch question content and editor code
-    let question_content: String = api_calls::get_question_content(&problem_title)?;
-    let question_editor_data: String = api_calls::get_question_editor_data(&problem_title)?;
-    let examples_data: String = api_calls::get_examples_data(&problem_title)?;
+    let client = Client::new().with(CookieMiddleware::new());
+    let question_content: String = api_calls::get_question_content(&client, &problem_title)?;
+    let question_editor_data: String =
+        api_calls::get_question_editor_data(&client, &problem_title)?;
+    let examples_data: String = api_calls::get_examples_data(&client, &problem_title)?;
 
     // Parse the JSON responses
     let mut description: String = parser::parse_question_content(&question_content)?;

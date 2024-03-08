@@ -7,8 +7,9 @@ edition = "2021"
 
 [dependencies]
 tokio = { version = "1", features = ["full"] }
-reqwest = { version = "0.11", features = ["json"]}
 serde_json = "1.0"
 log = "0.4"
 env_logger = "0.9"
 html2text = "0.12.0"
+surf = "2.3.2"
+surf-cookie-middleware = "0.3.0"
