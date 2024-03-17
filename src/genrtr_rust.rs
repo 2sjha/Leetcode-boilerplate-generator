@@ -88,7 +88,7 @@ fn rust_code_for_example(
     }
     example_string += format!(
         "{}_{});\n",
-        &example.get_input_var_types()[i].0,
+        snake_case(&example.get_input_var_types()[i].0),
         example_number
     )
     .as_str();
