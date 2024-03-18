@@ -7,15 +7,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'lc-starter-gen'",
+            "name": "Debug executable 'lc-boilerplate-generator'",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=lc-starter-gen",
-                    "--package=lc-starter-gen"
+                    "--bin=lc-boilerplate-generator",
+                    "--package=lc-boilerplate-generator"
                 ],
                 "filter": {
-                    "name": "lc-starter-gen",
+                    "name": "lc-boilerplate-generator",
                     "kind": "bin"
                 }
             },
@@ -25,16 +25,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'lc-starter-gen'",
+            "name": "Debug unit tests in executable 'lc-boilerplate-generator'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=lc-starter-gen",
-                    "--package=lc-starter-gen"
+                    "--bin=lc-boilerplate-generator",
+                    "--package=lc-boilerplate-generator"
                 ],
                 "filter": {
-                    "name": "lc-starter-gen",
+                    "name": "lc-boilerplate-generator",
                     "kind": "bin"
                 }
             },

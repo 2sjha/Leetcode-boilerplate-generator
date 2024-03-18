@@ -41,12 +41,16 @@ fn get_text_from_html(question_content_as_html: &String) -> String {
 
 pub fn parse_output_values_from_description(description: &String) -> Vec<String> {
     let mut output_values: Vec<String> = Vec::new();
-    const OUTPUT_PREFIX: &str = "**Output:**";
+    const OUTPUT_PREFIX_1: &str = "**Output:**";
+    const OUTPUT_PREFIX_2: &str = "**Output: **";
 
     let lines = description.lines();
     for line in lines {
-        if line.starts_with(OUTPUT_PREFIX) {
-            let output: &str = &line[(OUTPUT_PREFIX.len() + 1)..];
+        if line.starts_with(OUTPUT_PREFIX_1) {
+            let output: &str = &line[(OUTPUT_PREFIX_1.len() + 1)..];
+            output_values.push(String::from(output));
+        } else if line.starts_with(OUTPUT_PREFIX_2) {
+            let output: &str = &line[(OUTPUT_PREFIX_2.len() + 1)..];
             output_values.push(String::from(output));
         }
     }
