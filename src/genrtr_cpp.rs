@@ -155,6 +155,20 @@ fn cpp_code_for_input_var(lc_var_type: &String, var_value: &String) -> Option<(S
                 cpp_var_value.push(c);
             }
         }
+    } else if lc_var_type == utils::IN_LIST_CHAR {
+        cpp_var_type = String::from("vector<char>");
+        cpp_var_value = String::new();
+        for c in var_value.chars() {
+            if c == '[' {
+                cpp_var_value.push('{');
+            } else if c == ']' {
+                cpp_var_value.push('}')
+            } else if c == '\"' {
+                cpp_var_value += "\'"
+            } else {
+                cpp_var_value.push(c);
+            }
+        }
     } else {
         return None;
     }

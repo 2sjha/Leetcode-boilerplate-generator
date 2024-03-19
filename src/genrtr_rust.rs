@@ -162,6 +162,18 @@ fn rust_code_for_input_var(lc_var_type: &String, var_value: &String) -> Option<(
                 rust_var_value.push(c);
             }
         }
+    } else if lc_var_type == utils::IN_LIST_CHAR {
+        rust_var_type = String::from("Vec<char>");
+        rust_var_value = String::new();
+        for c in var_value.chars() {
+            if c == '[' {
+                rust_var_value += "vec!["
+            } else if c == '\"' {
+                rust_var_value += "\'"
+            } else {
+                rust_var_value.push(c);
+            }
+        }
     } else {
         return None;
     }

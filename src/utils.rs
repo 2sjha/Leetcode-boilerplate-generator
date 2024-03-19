@@ -12,6 +12,7 @@ pub const LANGUAGE_LIST: [&str; 2] = [LANG_CPP, LANG_RUST];
 pub const IN_INT: &str = "integer";
 pub const IN_STRING: &str = "string";
 pub const IN_LIST_INT: &str = "integer[]";
+pub const IN_LIST_CHAR: &str = "character[]";
 pub const IN_LIST_STRING: &str = "string[]";
 pub const IN_LIST_STRING2: &str = "list<string>";
 pub const IN_MATRIX_INT: &str = "integer[][]";
