@@ -191,6 +191,9 @@ fn rust_code_for_output_var(lc_var_type: &String, var_value: &String) -> Option<
     } else if lc_var_type == utils::OUT_BOOL {
         rust_var_type = String::from("bool");
         rust_var_value = var_value.clone();
+    } else if lc_var_type == utils::OUT_LONG {
+        rust_var_type = String::from("i64");
+        rust_var_value = var_value.clone();
     } else if lc_var_type == utils::OUT_VOID {
         rust_var_type = String::from("()");
         rust_var_value = var_value.clone();

@@ -186,6 +186,9 @@ fn cpp_code_for_output_var(lc_var_type: &String, var_value: &String) -> Option<(
     } else if lc_var_type == utils::OUT_BOOL {
         cpp_var_type = String::from("bool");
         cpp_var_value = var_value.clone();
+    } else if lc_var_type == utils::OUT_LONG {
+        cpp_var_type = String::from("long long");
+        cpp_var_value = var_value.clone();
     } else if lc_var_type == utils::OUT_VOID {
         cpp_var_type = String::new();
         cpp_var_value = var_value.clone();

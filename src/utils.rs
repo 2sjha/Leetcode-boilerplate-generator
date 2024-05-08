@@ -22,6 +22,7 @@ pub const OUT_VOID: &str = "void";
 pub const OUT_INT: &str = "integer";
 pub const OUT_BOOL: &str = "boolean";
 pub const OUT_STRING: &str = "string";
+pub const OUT_LONG: &str = "long";
 pub const OUT_LIST_INT: &str = "list<integer>";
 pub const OUT_LIST_INT2: &str = "integer[]";
 pub const OUT_LIST_STRING: &str = "list<string>";
