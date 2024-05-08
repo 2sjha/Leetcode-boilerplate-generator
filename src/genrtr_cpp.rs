@@ -236,6 +236,7 @@ fn print_output(lc_var_type: &String, example_number: usize) -> String {
     } else if lc_var_type == utils::OUT_INT
         || lc_var_type == utils::OUT_BOOL
         || lc_var_type == utils::OUT_STRING
+        || lc_var_type == utils::OUT_LONG
     {
         print_output = format!("\tcout << output_{} << endl;\n", example_number);
     } else if lc_var_type == utils::OUT_LIST_INT
